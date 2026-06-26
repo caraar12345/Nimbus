@@ -133,6 +133,12 @@ func main() {
 	// Create fiber app
 	app := fiber.New(fiber.Config{
 		AppName: "Nimbus API",
+		// fasthttp's default read buffer (4 KiB) must hold the entire request
+		// header block. Behind a forward-auth proxy (e.g. Authentik) the
+		// injected headers (large JWTs, group lists) easily exceed this and the
+		// request is rejected with 431 Request Header Fields Too Large. Give
+		// plenty of headroom for those deployments.
+		ReadBufferSize: 16384,
 	})
 
 	// Middleware
